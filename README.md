@@ -14,6 +14,4 @@ Pokémon Explorer is a React application that allows users to search and filter 
 
 ---
 
-## Installation
-
-
+## 

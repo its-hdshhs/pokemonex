@@ -16,17 +16,22 @@ const App = () => {
   useEffect(() => {
     const fetchPokemon = async () => {
       try {
-        // Fetch the first 150 Pokémon with their details in one request
+        // Fetch the first 150 Pokémon
         const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=150');
         const results = response.data.results;
 
-        // Map the results to include only necessary data
-        const detailedPokemon = results.map((pokemon, index) => ({
-          id: index + 1,
-          name: pokemon.name,
-          image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png`,
-          types: [], // Types will be fetched separately
-        }));
+        // Fetch detailed data for each Pokémon
+        const detailedPokemon = await Promise.all(
+          results.map(async (pokemon, index) => {
+            const details = await axios.get(pokemon.url);
+            return {
+              id: details.data.id,
+              name: details.data.name,
+              image: details.data.sprites.front_default,
+              types: details.data.types.map((type) => type.type.name),
+            };
+          })
+        );
 
         setPokemon(detailedPokemon);
         setFilteredPokemon(detailedPokemon);
